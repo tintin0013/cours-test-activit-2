@@ -3,28 +3,25 @@ import App from "./App";
 
 /**
  * @file App.integration.test.js
- * @description
+ *
  * Integration tests for the User form.
  *
- * These tests simulate real user interaction
- * and verify the integration between:
+ * These tests simulate real user interaction and verify:
+ * - Rendering of the form
+ * - Validation logic integration
+ * - Visual feedback in the DOM (role="alert")
+ *
+ * We test the full chain:
  * App.js → validator.js → module.js
  *
- * Covered scenarios:
- * - Rendering of all form fields
- * - Successful submission
- * - Under 18 error
- * - Invalid email format
- * - Invalid postal code
- *
- * We now verify visual feedback (role="alert")
- * instead of using window.alert (better practice).
+ * The goal is to validate real user behaviour,
+ * not internal implementation details.
  */
 
 describe("Integration test - User form", () => {
 
   /**
-   * Test rendering of all required inputs
+   * The form should render all required inputs
    * and the submit button.
    */
   test("should render the form fields and submit button", () => {
@@ -41,12 +38,16 @@ describe("Integration test - User form", () => {
   });
 
   /**
-   * Valid form submission should display success message
-   * inside a visual alert element.
+   * A valid submission should:
+   * - Display a success message
+   * - Render it inside an element with role="alert"
    */
   test("should submit valid form and show success message", () => {
 
     render(<App />);
+
+    // Before submit, no alert should be visible
+    expect(screen.queryByRole("alert")).toBeNull();
 
     fireEvent.change(screen.getByLabelText(/prénom/i), {
       target: { value: "Jean" }
@@ -70,12 +71,15 @@ describe("Integration test - User form", () => {
 
     fireEvent.submit(screen.getByRole("button"));
 
-    expect(screen.getByRole("alert")).toHaveTextContent("Utilisateur valide");
+    const alert = screen.getByRole("alert");
+
+    expect(alert).toBeInTheDocument();
+    expect(alert).toHaveTextContent("Utilisateur valide");
   });
 
   /**
-   * Under 18 user should trigger AGE_UNDER_18 error
-   * and display the error visually.
+   * If user is under 18:
+   * - AGE_UNDER_18 should be displayed visually
    */
   test("should show error if user is under 18", () => {
 
@@ -103,12 +107,14 @@ describe("Integration test - User form", () => {
 
     fireEvent.submit(screen.getByRole("button"));
 
-    expect(screen.getByRole("alert")).toHaveTextContent("AGE_UNDER_18");
+    const alert = screen.getByRole("alert");
+
+    expect(alert).toHaveTextContent("AGE_UNDER_18");
   });
 
   /**
-   * Invalid email format should trigger INVALID_EMAIL error
-   * and display the error visually.
+   * If email format is invalid:
+   * - INVALID_EMAIL should be displayed
    */
   test("should show error if email format is invalid", () => {
 
@@ -136,12 +142,14 @@ describe("Integration test - User form", () => {
 
     fireEvent.submit(screen.getByRole("button"));
 
-    expect(screen.getByRole("alert")).toHaveTextContent("INVALID_EMAIL");
+    const alert = screen.getByRole("alert");
+
+    expect(alert).toHaveTextContent("INVALID_EMAIL");
   });
 
   /**
-   * Invalid postal code should trigger INVALID_POSTAL_CODE error
-   * and display the error visually.
+   * If postal code format is invalid:
+   * - INVALID_POSTAL_CODE should be displayed
    */
   test("should show error if postal code format is invalid", () => {
 
@@ -169,7 +177,9 @@ describe("Integration test - User form", () => {
 
     fireEvent.submit(screen.getByRole("button"));
 
-    expect(screen.getByRole("alert")).toHaveTextContent("INVALID_POSTAL_CODE");
+    const alert = screen.getByRole("alert");
+
+    expect(alert).toHaveTextContent("INVALID_POSTAL_CODE");
   });
 
 });

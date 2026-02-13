@@ -7,14 +7,18 @@ import { calculateAge } from "./module";
 /**
  * Validate the age of a person.
  *
- * Checks:
- * - person exists
- * - person.birth exists
- * - user is at least 18 years old
+ * Business rules:
+ * - The person object must exist
+ * - The person must contain a birth property
+ * - The user must be at least 18 years old
  *
- * @param {Object} person - Object containing at least a birth Date property
- * @throws {Error} INVALID_USER if object is missing
+ * @param {Object} person - Object representing a person
+ * @param {Date} person.birth - Birth date of the person
+ *
+ * @throws {Error} INVALID_USER if person is missing or invalid
  * @throws {Error} AGE_UNDER_18 if age is less than 18
+ *
+ * @returns {void}
  */
 export function validateAge(person) {
 
@@ -34,15 +38,21 @@ export function validateAge(person) {
 }
 
 /**
- * Validate a postal code.
+ * Validate a French postal code.
  *
- * Rules:
+ * Business rules:
  * - Must exist
  * - Must be a string
  * - Must contain exactly 5 digits
  *
  * @param {string} code - French postal code
- * @throws {Error} INVALID_POSTAL_CODE if format is incorrect
+ *
+ * @throws {Error} INVALID_POSTAL_CODE if:
+ * - value is missing
+ * - value is not a string
+ * - value does not match 5 digit format
+ *
+ * @returns {void}
  */
 export function validatePostalCode(code) {
 
@@ -60,13 +70,19 @@ export function validatePostalCode(code) {
 /**
  * Validate an email address.
  *
- * Rules:
+ * Business rules:
  * - Must exist
  * - Must be a string
  * - Must follow a simple email pattern
  *
  * @param {string} email - Email address to validate
- * @throws {Error} INVALID_EMAIL if format is incorrect
+ *
+ * @throws {Error} INVALID_EMAIL if:
+ * - value is missing
+ * - value is not a string
+ * - value does not match email format
+ *
+ * @returns {void}
  */
 export function validateEmail(email) {
 
@@ -84,13 +100,19 @@ export function validateEmail(email) {
 /**
  * Validate identity (firstname or lastname).
  *
- * Rules:
+ * Business rules:
  * - Must exist
  * - Must be a string
- * - Only letters, accents and hyphen allowed
+ * - Only letters (including accents) and hyphen allowed
  *
- * @param {string} value - Name or firstname
- * @throws {Error} INVALID_IDENTITY if value is empty or invalid
+ * @param {string} value - Firstname or lastname
+ *
+ * @throws {Error} INVALID_IDENTITY if:
+ * - value is missing
+ * - value is not a string
+ * - value contains invalid characters
+ *
+ * @returns {void}
  */
 export function validateIdentity(value) {
 
@@ -106,18 +128,25 @@ export function validateIdentity(value) {
 }
 
 /**
- * Validate a full user object.
+ * Validate a complete user object.
  *
- * Calls all individual validation functions.
+ * This function delegates validation to:
+ * - validateAge
+ * - validatePostalCode
+ * - validateEmail
+ * - validateIdentity (firstname and lastname)
  *
- * @param {Object} user - Object representing a user
+ * @param {Object} user - User object to validate
  * @param {Date} user.birth - Birth date
- * @param {string} user.postalCode - French postal code
+ * @param {string} user.postalCode - Postal code
  * @param {string} user.email - Email address
- * @param {string} user.firstname - Firstname
- * @param {string} user.lastname - Lastname
+ * @param {string} user.firstname - First name
+ * @param {string} user.lastname - Last name
+ *
+ * @throws {Error} INVALID_USER if user object is invalid
+ * @throws {Error} Any error thrown by validation sub-functions
+ *
  * @returns {boolean} Returns true if all validations pass
- * @throws {Error} Throws an error if any validation fails
  */
 export function validateUser(user) {
 
