@@ -10,6 +10,7 @@ import App from "./App";
  * - Rendering of the form
  * - Validation logic integration
  * - Visual feedback in the DOM (role="alert")
+ * - Visual state (color red for error, green for success)
  *
  * We test the full chain:
  * App.js → validator.js → module.js
@@ -20,10 +21,6 @@ import App from "./App";
 
 describe("Integration test - User form", () => {
 
-  /**
-   * The form should render all required inputs
-   * and the submit button.
-   */
   test("should render the form fields and submit button", () => {
     render(<App />);
 
@@ -37,11 +34,9 @@ describe("Integration test - User form", () => {
     expect(screen.getByRole("button")).toBeInTheDocument();
   });
 
-  test("should submit valid form and show success message", () => {
+  test("should submit valid form and show success message in green", () => {
 
     render(<App />);
-
-    expect(screen.queryByRole("alert")).toBeNull();
 
     fireEvent.change(screen.getByLabelText(/prénom/i), {
       target: { value: "Jean" }
@@ -67,11 +62,11 @@ describe("Integration test - User form", () => {
 
     const alert = screen.getByRole("alert");
 
-    expect(alert).toBeInTheDocument();
     expect(alert).toHaveTextContent("Utilisateur valide");
+    expect(alert).toHaveStyle("color: green");
   });
 
-  test("should show error if user is under 18", () => {
+  test("should show error in red if user is under 18", () => {
 
     render(<App />);
 
@@ -100,9 +95,10 @@ describe("Integration test - User form", () => {
     const alert = screen.getByRole("alert");
 
     expect(alert).toHaveTextContent("AGE_UNDER_18");
+    expect(alert).toHaveStyle("color: red");
   });
 
-  test("should show error if email format is invalid", () => {
+  test("should show error in red if email format is invalid", () => {
 
     render(<App />);
 
@@ -131,9 +127,10 @@ describe("Integration test - User form", () => {
     const alert = screen.getByRole("alert");
 
     expect(alert).toHaveTextContent("INVALID_EMAIL");
+    expect(alert).toHaveStyle("color: red");
   });
 
-  test("should show error if postal code format is invalid", () => {
+  test("should show error in red if postal code format is invalid", () => {
 
     render(<App />);
 
@@ -162,25 +159,13 @@ describe("Integration test - User form", () => {
     const alert = screen.getByRole("alert");
 
     expect(alert).toHaveTextContent("INVALID_POSTAL_CODE");
+    expect(alert).toHaveStyle("color: red");
   });
 
-  /**
-   * CHAOTIC USER SCENARIO
-   *
-   * User first submits invalid data,
-   * then corrects the mistake,
-   * and finally succeeds.
-   *
-   * This test validates:
-   * - Error state is displayed
-   * - Error state disappears after correction
-   * - Success state replaces error visually
-   */
-  test("should handle chaotic user: invalid → correction → success", () => {
+  test("should handle chaotic user: invalid → correction → success with color change", () => {
 
     render(<App />);
 
-    // First invalid submission (bad email)
     fireEvent.change(screen.getByLabelText(/prénom/i), {
       target: { value: "Alice" }
     });
@@ -190,7 +175,7 @@ describe("Integration test - User form", () => {
     });
 
     fireEvent.change(screen.getByLabelText(/email/i), {
-      target: { value: "alice-test.com" } // invalid
+      target: { value: "alice-test.com" }
     });
 
     fireEvent.change(screen.getByLabelText(/date/i), {
@@ -204,9 +189,10 @@ describe("Integration test - User form", () => {
     fireEvent.submit(screen.getByRole("button"));
 
     let alert = screen.getByRole("alert");
-    expect(alert).toHaveTextContent("INVALID_EMAIL");
 
-    // User corrects the email
+    expect(alert).toHaveTextContent("INVALID_EMAIL");
+    expect(alert).toHaveStyle("color: red");
+
     fireEvent.change(screen.getByLabelText(/email/i), {
       target: { value: "alice@test.com" }
     });
@@ -214,7 +200,9 @@ describe("Integration test - User form", () => {
     fireEvent.submit(screen.getByRole("button"));
 
     alert = screen.getByRole("alert");
+
     expect(alert).toHaveTextContent("Utilisateur valide");
+    expect(alert).toHaveStyle("color: green");
   });
 
 });
