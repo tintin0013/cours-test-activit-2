@@ -11,6 +11,11 @@ import { calculateAge } from "./module";
  * @throws {Error} Throws AGE_UNDER_18 if the person is under 18 years old
  */
 export function validateAge(person) {
+
+    if (!person) {
+        throw new Error("INVALID_USER");
+    }
+
     const age = calculateAge(person);
 
     if (age < 18) {
@@ -25,6 +30,11 @@ export function validateAge(person) {
  * @throws {Error} Throws INVALID_POSTAL_CODE if format is incorrect
  */
 export function validatePostalCode(code) {
+
+    if (!code) {
+        throw new Error("INVALID_POSTAL_CODE");
+    }
+
     const regex = /^[0-9]{5}$/;
 
     if (!regex.test(code)) {
@@ -39,6 +49,11 @@ export function validatePostalCode(code) {
  * @throws {Error} Throws INVALID_EMAIL if format is incorrect
  */
 export function validateEmail(email) {
+
+    if (!email) {
+        throw new Error("INVALID_EMAIL");
+    }
+
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!regex.test(email)) {
@@ -78,6 +93,11 @@ export function validateIdentity(value) {
  * @throws {Error} Throws an error if any validation fails
  */
 export function validateUser(user) {
+
+    if (!user) {
+        throw new Error("INVALID_USER");
+    }
+
     validateAge(user);
     validatePostalCode(user.postalCode);
     validateEmail(user.email);
