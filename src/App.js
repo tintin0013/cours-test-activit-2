@@ -7,7 +7,7 @@ import { validateUser } from "./validator";
  *
  * This component manages:
  * - Form submission
- * - Validation logic
+ * - Basic form validation state
  * - Visual feedback (success or error message)
  *
  * @component
@@ -16,9 +16,7 @@ import { validateUser } from "./validator";
 function App() {
 
   /**
-   * State used to display feedback message
-   * after form submission.
-   *
+   * Feedback message state.
    * message: string | null
    * type: "success" | "error" | null
    */
@@ -26,17 +24,56 @@ function App() {
   const [type, setType] = useState(null);
 
   /**
+   * Simple state to track if form is valid
+   * (all required fields filled).
+   *
+   * @type {boolean}
+   */
+  const [isFormValid, setIsFormValid] = useState(false);
+
+  /**
+   * Checks if all required fields contain a value.
+   * This is a simple UI-level validation (not business validation).
+   *
+   * @param {HTMLFormElement} form
+   */
+  function checkFormValidity(form) {
+    const formData = new FormData(form);
+
+    const firstname = formData.get("firstname");
+    const lastname = formData.get("lastname");
+    const email = formData.get("email");
+    const birth = formData.get("birth");
+    const postalCode = formData.get("postalCode");
+
+    if (
+      firstname &&
+      lastname &&
+      email &&
+      birth &&
+      postalCode
+    ) {
+      setIsFormValid(true);
+    } else {
+      setIsFormValid(false);
+    }
+  }
+
+  /**
+   * Handle input changes.
+   * Re-checks form validity whenever user types.
+   *
+   * @param {React.FormEvent<HTMLFormElement>} event
+   */
+  function handleChange(event) {
+    const form = event.currentTarget.form;
+    checkFormValidity(form);
+  }
+
+  /**
    * Handle form submission.
-   * Extracts form data safely using FormData API,
-   * builds a user object and validates it.
    *
-   * If validation succeeds:
-   * - Display success message in UI
-   *
-   * If validation fails:
-   * - Display error message in UI
-   *
-   * @param {React.FormEvent<HTMLFormElement>} event Submit event
+   * @param {React.FormEvent<HTMLFormElement>} event
    */
   function handleSubmit(event) {
     event.preventDefault();
@@ -72,38 +109,69 @@ function App() {
       <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="firstname">Prénom</label>
-          <input id="firstname" name="firstname" type="text" />
+          <input
+            id="firstname"
+            name="firstname"
+            type="text"
+            onChange={handleChange}
+          />
         </div>
 
         <div>
           <label htmlFor="lastname">Nom</label>
-          <input id="lastname" name="lastname" type="text" />
+          <input
+            id="lastname"
+            name="lastname"
+            type="text"
+            onChange={handleChange}
+          />
         </div>
 
         <div>
           <label htmlFor="email">Email</label>
-          <input id="email" name="email" type="email" />
+          <input
+            id="email"
+            name="email"
+            type="email"
+            onChange={handleChange}
+          />
         </div>
 
         <div>
           <label htmlFor="birth">Date de naissance</label>
-          <input id="birth" name="birth" type="date" />
+          <input
+            id="birth"
+            name="birth"
+            type="date"
+            onChange={handleChange}
+          />
         </div>
 
         <div>
           <label htmlFor="city">Ville</label>
-          <input id="city" name="city" type="text" />
+          <input
+            id="city"
+            name="city"
+            type="text"
+            onChange={handleChange}
+          />
         </div>
 
         <div>
           <label htmlFor="postalCode">Code postal</label>
-          <input id="postalCode" name="postalCode" type="text" />
+          <input
+            id="postalCode"
+            name="postalCode"
+            type="text"
+            onChange={handleChange}
+          />
         </div>
 
-        <button type="submit">Envoyer</button>
+        <button type="submit" disabled={!isFormValid}>
+          Envoyer
+        </button>
       </form>
 
-      {/* Visual feedback section */}
       {message && (
         <div
           role="alert"
