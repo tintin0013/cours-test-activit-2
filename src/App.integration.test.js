@@ -3,10 +3,15 @@ import App from "./App";
 
 /**
  * Integration tests for the User form.
+ *
  * These tests verify:
  * - Rendering of all form fields
  * - Successful submission with valid data
- * - Error handling for invalid business rules
+ * - Error handling for business rules (age, email format)
+ *
+ * The goal is to simulate real user interaction
+ * and validate integration between:
+ * App.js → validator.js → module.js
  */
 describe("Integration test - User form", () => {
 
@@ -85,7 +90,7 @@ describe("Integration test - User form", () => {
       target: { value: "tom@test.com" }
     });
 
-    // Date récente → moins de 18 ans
+    // Recent date → under 18
     fireEvent.change(screen.getByLabelText(/date/i), {
       target: { value: "2015-01-01" }
     });
@@ -97,6 +102,42 @@ describe("Integration test - User form", () => {
     fireEvent.submit(screen.getByRole("button"));
 
     expect(window.alert).toHaveBeenCalledWith("AGE_UNDER_18");
+  });
+
+  /**
+   * If email format is invalid,
+   * validator should throw INVALID_EMAIL
+   * and alert should display the error message.
+   */
+  test("should show error if email format is invalid", () => {
+
+    window.alert = jest.fn();
+
+    render(<App />);
+
+    fireEvent.change(screen.getByLabelText(/prénom/i), {
+      target: { value: "Marie" }
+    });
+
+    fireEvent.change(screen.getByLabelText(/^Nom$/i), {
+      target: { value: "Martin" }
+    });
+
+    fireEvent.change(screen.getByLabelText(/email/i), {
+      target: { value: "marie-test.com" } // invalid email
+    });
+
+    fireEvent.change(screen.getByLabelText(/date/i), {
+      target: { value: "1995-05-10" }
+    });
+
+    fireEvent.change(screen.getByLabelText(/code postal/i), {
+      target: { value: "75000" }
+    });
+
+    fireEvent.submit(screen.getByRole("button"));
+
+    expect(window.alert).toHaveBeenCalledWith("INVALID_EMAIL");
   });
 
 });
