@@ -1,9 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { validateUser } from "./validator";
 
 /**
  * Main application component.
  * Displays a user form and validates the data on submit.
+ *
+ * This component manages:
+ * - Form submission
+ * - Validation logic
+ * - Visual feedback (success or error message)
  *
  * @component
  * @returns {JSX.Element} Rendered form component
@@ -11,19 +16,32 @@ import { validateUser } from "./validator";
 function App() {
 
   /**
+   * State used to display feedback message
+   * after form submission.
+   *
+   * message: string | null
+   * type: "success" | "error" | null
+   */
+  const [message, setMessage] = useState(null);
+  const [type, setType] = useState(null);
+
+  /**
    * Handle form submission.
    * Extracts form data safely using FormData API,
    * builds a user object and validates it.
+   *
+   * If validation succeeds:
+   * - Display success message in UI
+   *
+   * If validation fails:
+   * - Display error message in UI
    *
    * @param {React.FormEvent<HTMLFormElement>} event Submit event
    */
   function handleSubmit(event) {
     event.preventDefault();
 
-    // On récupère toujours le form correctement
     const form = event.currentTarget;
-
-    // Utilisation de FormData (plus robuste en test)
     const formData = new FormData(form);
 
     const user = {
@@ -36,9 +54,14 @@ function App() {
 
     try {
       validateUser(user);
-      alert("Utilisateur valide");
+
+      setMessage("Utilisateur valide");
+      setType("success");
+
     } catch (error) {
-      alert(error.message);
+
+      setMessage(error.message);
+      setType("error");
     }
   }
 
@@ -79,6 +102,19 @@ function App() {
 
         <button type="submit">Envoyer</button>
       </form>
+
+      {/* Visual feedback section */}
+      {message && (
+        <div
+          role="alert"
+          style={{
+            marginTop: "20px",
+            color: type === "error" ? "red" : "green"
+          }}
+        >
+          {message}
+        </div>
+      )}
     </div>
   );
 }

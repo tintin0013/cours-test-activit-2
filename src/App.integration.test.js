@@ -16,6 +16,9 @@ import App from "./App";
  * - Under 18 error
  * - Invalid email format
  * - Invalid postal code
+ *
+ * We now verify visual feedback (role="alert")
+ * instead of using window.alert (better practice).
  */
 
 describe("Integration test - User form", () => {
@@ -38,11 +41,10 @@ describe("Integration test - User form", () => {
   });
 
   /**
-   * Valid form submission should display success message.
+   * Valid form submission should display success message
+   * inside a visual alert element.
    */
-  test("should submit valid form and show success alert", () => {
-
-    window.alert = jest.fn();
+  test("should submit valid form and show success message", () => {
 
     render(<App />);
 
@@ -68,15 +70,14 @@ describe("Integration test - User form", () => {
 
     fireEvent.submit(screen.getByRole("button"));
 
-    expect(window.alert).toHaveBeenCalledWith("Utilisateur valide");
+    expect(screen.getByRole("alert")).toHaveTextContent("Utilisateur valide");
   });
 
   /**
-   * Under 18 user should trigger AGE_UNDER_18 error.
+   * Under 18 user should trigger AGE_UNDER_18 error
+   * and display the error visually.
    */
   test("should show error if user is under 18", () => {
-
-    window.alert = jest.fn();
 
     render(<App />);
 
@@ -102,15 +103,14 @@ describe("Integration test - User form", () => {
 
     fireEvent.submit(screen.getByRole("button"));
 
-    expect(window.alert).toHaveBeenCalledWith("AGE_UNDER_18");
+    expect(screen.getByRole("alert")).toHaveTextContent("AGE_UNDER_18");
   });
 
   /**
-   * Invalid email format should trigger INVALID_EMAIL error.
+   * Invalid email format should trigger INVALID_EMAIL error
+   * and display the error visually.
    */
   test("should show error if email format is invalid", () => {
-
-    window.alert = jest.fn();
 
     render(<App />);
 
@@ -136,15 +136,14 @@ describe("Integration test - User form", () => {
 
     fireEvent.submit(screen.getByRole("button"));
 
-    expect(window.alert).toHaveBeenCalledWith("INVALID_EMAIL");
+    expect(screen.getByRole("alert")).toHaveTextContent("INVALID_EMAIL");
   });
 
   /**
-   * Invalid postal code should trigger INVALID_POSTAL_CODE error.
+   * Invalid postal code should trigger INVALID_POSTAL_CODE error
+   * and display the error visually.
    */
   test("should show error if postal code format is invalid", () => {
-
-    window.alert = jest.fn();
 
     render(<App />);
 
@@ -165,12 +164,12 @@ describe("Integration test - User form", () => {
     });
 
     fireEvent.change(screen.getByLabelText(/code postal/i), {
-      target: { value: "75A00" } // invalid postal code
+      target: { value: "75A00" }
     });
 
     fireEvent.submit(screen.getByRole("button"));
 
-    expect(window.alert).toHaveBeenCalledWith("INVALID_POSTAL_CODE");
+    expect(screen.getByRole("alert")).toHaveTextContent("INVALID_POSTAL_CODE");
   });
 
 });

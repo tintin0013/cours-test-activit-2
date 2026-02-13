@@ -65,6 +65,23 @@ describe("validator", () => {
     });
 
     /**
+     * NEW EDGE CASES FOR AGE
+     */
+
+    it("should throw INVALID_USER if person is null", () => {
+        expect(() => {
+            validateAge(null);
+        }).toThrow("INVALID_USER");
+    });
+
+    it("should throw INVALID_USER if birth field is missing", () => {
+        const person = {};
+        expect(() => {
+            validateAge(person);
+        }).toThrow("INVALID_USER");
+    });
+
+    /**
      * POSTAL CODE VALIDATION
      */
 
@@ -84,6 +101,16 @@ describe("validator", () => {
         expect(() => {
             validatePostalCode("123");
         }).toThrow();
+    });
+
+    /**
+     * NEW EDGE CASE FOR POSTAL CODE
+     */
+
+    it("should throw INVALID_POSTAL_CODE if postal code is not a string", () => {
+        expect(() => {
+            validatePostalCode(75001);
+        }).toThrow("INVALID_POSTAL_CODE");
     });
 
     /**
@@ -109,6 +136,16 @@ describe("validator", () => {
     });
 
     /**
+     * NEW EDGE CASE FOR EMAIL
+     */
+
+    it("should throw INVALID_EMAIL if email is not a string", () => {
+        expect(() => {
+            validateEmail(12345);
+        }).toThrow("INVALID_EMAIL");
+    });
+
+    /**
      * IDENTITY VALIDATION
      */
 
@@ -128,6 +165,16 @@ describe("validator", () => {
         expect(() => {
             validateIdentity(null);
         }).toThrow();
+    });
+
+    /**
+     * NEW EDGE CASE FOR IDENTITY
+     */
+
+    it("should throw INVALID_IDENTITY if identity is not a string", () => {
+        expect(() => {
+            validateIdentity(123);
+        }).toThrow("INVALID_IDENTITY");
     });
 
     /**
@@ -164,6 +211,16 @@ describe("validator", () => {
         expect(() => {
             validateUser(user);
         }).toThrow();
+    });
+
+    /**
+     * NEW EDGE CASE FOR USER
+     */
+
+    it("should throw INVALID_USER if user object is null", () => {
+        expect(() => {
+            validateUser(null);
+        }).toThrow("INVALID_USER");
     });
 
 });
