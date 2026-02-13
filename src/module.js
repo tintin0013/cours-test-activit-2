@@ -9,6 +9,10 @@
  * checks the birth date format, and then calculates
  * the age based on the current date.
  *
+ * The function is intentionally written in a clear
+ * and step-by-step way (student style) to make
+ * validation logic easy to understand and test.
+ *
  * @param {Object} p - Object representing a person
  * @param {Date} p.birth - Birth date of the person
  *
@@ -28,7 +32,7 @@ export function calculateAge(p) {
         throw new Error("missing param p");
     }
 
-    // Check if parameter is an object
+    // Check if parameter is really an object
     if (typeof p !== "object") {
         throw new Error("param p is not an object");
     }
@@ -43,7 +47,7 @@ export function calculateAge(p) {
         throw new Error("birth is not a date");
     }
 
-    // Check if date is valid
+    // Check if birth date is valid
     if (isNaN(p.birth.getTime())) {
         throw new Error("birth date is invalid");
     }
@@ -55,12 +59,17 @@ export function calculateAge(p) {
 
     const monthDiff = today.getMonth() - birthDate.getMonth();
 
-    // Adjust age if birthday has not occurred yet this year
-    if (
-        monthDiff < 0 ||
-        (monthDiff === 0 && today.getDate() < birthDate.getDate())
-    ) {
+    // If birthday has not happened yet this year,
+    // we decrease the calculated age
+    if (monthDiff < 0) {
         age--;
+    } else if (monthDiff === 0 && today.getDate() < birthDate.getDate()) {
+        age--;
+    }
+
+    // Extra safety: age should never be negative
+    if (age < 0) {
+        return 0;
     }
 
     return age;
