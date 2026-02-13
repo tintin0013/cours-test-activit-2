@@ -3,26 +3,35 @@ import { validateUser } from "./validator";
 
 /**
  * Main application component.
- * Displays a simple user form and validates data on submit.
+ * Displays a user form and validates the data on submit.
+ *
+ * @component
+ * @returns {JSX.Element} Rendered form component
  */
 function App() {
 
   /**
    * Handle form submission.
-   * Builds a user object from form fields
-   * and calls validateUser from validator.js.
+   * Extracts form data safely using FormData API,
+   * builds a user object and validates it.
    *
-   * @param {Event} event Submit event
+   * @param {React.FormEvent<HTMLFormElement>} event Submit event
    */
   function handleSubmit(event) {
     event.preventDefault();
 
+    // On récupère toujours le form correctement
+    const form = event.currentTarget;
+
+    // Utilisation de FormData (plus robuste en test)
+    const formData = new FormData(form);
+
     const user = {
-      firstname: event.target.firstname.value,
-      lastname: event.target.lastname.value,
-      email: event.target.email.value,
-      birth: new Date(event.target.birth.value),
-      postalCode: event.target.postalCode.value
+      firstname: formData.get("firstname"),
+      lastname: formData.get("lastname"),
+      email: formData.get("email"),
+      birth: new Date(formData.get("birth")),
+      postalCode: formData.get("postalCode")
     };
 
     try {
