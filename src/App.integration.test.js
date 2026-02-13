@@ -11,6 +11,8 @@ import App from "./App";
  * - Validation logic integration
  * - Visual feedback in the DOM (role="alert")
  * - Visual state (color red for error, green for success)
+ * - Button disabled state (grey button when invalid)
+ * - localStorage persistence (jsdom simulation)
  *
  * We test the full chain:
  * App.js → validator.js → module.js
@@ -20,6 +22,10 @@ import App from "./App";
  */
 
 describe("Integration test - User form", () => {
+
+  beforeEach(() => {
+    localStorage.clear();
+  });
 
   test("should render the form fields and submit button", () => {
     render(<App />);
@@ -203,6 +209,180 @@ describe("Integration test - User form", () => {
 
     expect(alert).toHaveTextContent("Utilisateur valide");
     expect(alert).toHaveStyle("color: green");
+  });
+
+  test("should disable button and show grey style when form is invalid", () => {
+
+    render(<App />);
+
+    const button = screen.getByRole("button");
+
+    expect(button).toBeDisabled();
+    expect(button).toHaveClass("button-disabled");
+  });
+
+  test("should store correct user data in localStorage after successful submission", () => {
+
+    const setItemSpy = jest.spyOn(Storage.prototype, "setItem");
+
+    render(<App />);
+
+    fireEvent.change(screen.getByLabelText(/prénom/i), {
+      target: { value: "Laura" }
+    });
+
+    fireEvent.change(screen.getByLabelText(/^Nom$/i), {
+      target: { value: "Petit" }
+    });
+
+    fireEvent.change(screen.getByLabelText(/email/i), {
+      target: { value: "laura@test.com" }
+    });
+
+    fireEvent.change(screen.getByLabelText(/date/i), {
+      target: { value: "1990-01-01" }
+    });
+
+    fireEvent.change(screen.getByLabelText(/code postal/i), {
+      target: { value: "75000" }
+    });
+
+    fireEvent.submit(screen.getByRole("button"));
+
+    expect(setItemSpy).toHaveBeenCalledWith(
+      "user",
+      JSON.stringify({
+        firstname: "Laura",
+        lastname: "Petit",
+        email: "laura@test.com",
+        birth: new Date("1990-01-01"),
+        postalCode: "75000"
+      })
+    );
+
+    setItemSpy.mockRestore();
+  });
+
+  test("should display email error under email field", () => {
+
+    render(<App />);
+
+    fireEvent.change(screen.getByLabelText(/email/i), {
+      target: { value: "anna-test.com" }
+    });
+
+    fireEvent.blur(screen.getByLabelText(/email/i));
+
+    expect(screen.getByText("Email invalide")).toBeInTheDocument();
+  });
+
+  test("should display postal code error under postal code field", () => {
+
+    render(<App />);
+
+    fireEvent.change(screen.getByLabelText(/code postal/i), {
+      target: { value: "75A00" }
+    });
+
+    fireEvent.blur(screen.getByLabelText(/code postal/i));
+
+    expect(screen.getByText("Code postal invalide")).toBeInTheDocument();
+  });
+
+  test("should display identity error under firstname field", () => {
+
+    render(<App />);
+
+    fireEvent.change(screen.getByLabelText(/prénom/i), {
+      target: { value: "123" }
+    });
+
+    fireEvent.blur(screen.getByLabelText(/prénom/i));
+
+    expect(screen.getByText("Identité invalide")).toBeInTheDocument();
+  });
+
+  test("should display age error under birth field on submit", () => {
+
+    render(<App />);
+
+    fireEvent.change(screen.getByLabelText(/prénom/i), {
+      target: { value: "Paul" }
+    });
+
+    fireEvent.change(screen.getByLabelText(/^Nom$/i), {
+      target: { value: "Martin" }
+    });
+
+    fireEvent.change(screen.getByLabelText(/email/i), {
+      target: { value: "paul@test.com" }
+    });
+
+    fireEvent.change(screen.getByLabelText(/date/i), {
+      target: { value: "2015-01-01" }
+    });
+
+    fireEvent.change(screen.getByLabelText(/code postal/i), {
+      target: { value: "75000" }
+    });
+
+    fireEvent.submit(screen.getByRole("button"));
+
+    expect(screen.getByText("Vous devez avoir au moins 18 ans")).toBeInTheDocument();
+  });
+
+    test("should clear email error after valid blur", () => {
+
+    render(<App />);
+
+    const emailInput = screen.getByLabelText(/email/i);
+
+    // First blur with invalid email
+    fireEvent.change(emailInput, {
+      target: { value: "bad-email" }
+    });
+
+    fireEvent.blur(emailInput);
+
+    expect(screen.getByText("Email invalide")).toBeInTheDocument();
+
+    // Then correct email and blur again
+    fireEvent.change(emailInput, {
+      target: { value: "good@test.com" }
+    });
+
+    fireEvent.blur(emailInput);
+
+    expect(screen.queryByText("Email invalide")).not.toBeInTheDocument();
+  });
+
+    test("should display identity error under firstname on submit", () => {
+
+    render(<App />);
+
+    fireEvent.change(screen.getByLabelText(/prénom/i), {
+      target: { value: "12" }   // Invalid identity
+    });
+
+    fireEvent.change(screen.getByLabelText(/^Nom$/i), {
+      target: { value: "Valid" }
+    });
+
+    fireEvent.change(screen.getByLabelText(/email/i), {
+      target: { value: "valid@test.com" }
+    });
+
+    fireEvent.change(screen.getByLabelText(/date/i), {
+      target: { value: "1990-01-01" }
+    });
+
+    fireEvent.change(screen.getByLabelText(/code postal/i), {
+      target: { value: "75000" }
+    });
+
+    fireEvent.submit(screen.getByRole("button"));
+
+    expect(screen.getByText("Identité invalide")).toBeInTheDocument();
   });
 
 });

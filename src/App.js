@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { validateUser } from "./validator";
+import {
+  validateUser,
+  validateEmail,
+  validatePostalCode,
+  validateIdentity
+} from "./validator";
+import "./App.css";
 
 /**
  * Main application component.
@@ -7,51 +13,31 @@ import { validateUser } from "./validator";
  *
  * This component manages:
  * - Form submission
- * - Basic form validation state
- * - Visual feedback (success or error message)
+ * - Field-level validation on blur
+ * - Global validation on submit
+ * - Visual feedback
+ * - Button disabled state
+ * - localStorage persistence
  *
  * @component
- * @returns {JSX.Element} Rendered form component
+ * @returns {JSX.Element}
  */
 function App() {
 
-  /**
-   * Feedback message state.
-   * message: string | null
-   * type: "success" | "error" | null
-   */
   const [message, setMessage] = useState(null);
   const [type, setType] = useState(null);
-
-  /**
-   * Simple state to track if form is valid
-   * (all required fields filled).
-   *
-   * @type {boolean}
-   */
+  const [fieldErrors, setFieldErrors] = useState({});
   const [isFormValid, setIsFormValid] = useState(false);
 
-  /**
-   * Checks if all required fields contain a value.
-   * This is a simple UI-level validation (not business validation).
-   *
-   * @param {HTMLFormElement} form
-   */
   function checkFormValidity(form) {
     const formData = new FormData(form);
 
-    const firstname = formData.get("firstname");
-    const lastname = formData.get("lastname");
-    const email = formData.get("email");
-    const birth = formData.get("birth");
-    const postalCode = formData.get("postalCode");
-
     if (
-      firstname &&
-      lastname &&
-      email &&
-      birth &&
-      postalCode
+      formData.get("firstname") &&
+      formData.get("lastname") &&
+      formData.get("email") &&
+      formData.get("birth") &&
+      formData.get("postalCode")
     ) {
       setIsFormValid(true);
     } else {
@@ -59,23 +45,59 @@ function App() {
     }
   }
 
-  /**
-   * Handle input changes.
-   * Re-checks form validity whenever user types.
-   *
-   * @param {React.FormEvent<HTMLFormElement>} event
-   */
+  function handleBlur(event) {
+
+    const name = event.target.name;
+    const value = event.target.value;
+
+    let newErrors = { ...fieldErrors };
+
+    try {
+
+      if (name === "email") {
+        validateEmail(value);
+      }
+
+      if (name === "postalCode") {
+        validatePostalCode(value);
+      }
+
+      if (name === "firstname" || name === "lastname") {
+        validateIdentity(value);
+      }
+
+      newErrors[name] = null;
+
+    } catch (error) {
+
+      if (error.message === "INVALID_EMAIL") {
+        newErrors.email = "Email invalide";
+      }
+
+      if (error.message === "INVALID_POSTAL_CODE") {
+        newErrors.postalCode = "Code postal invalide";
+      }
+
+      if (error.message === "INVALID_IDENTITY") {
+        newErrors[name] = "Identité invalide";
+      }
+    }
+
+    setFieldErrors(newErrors);
+  }
+
   function handleChange(event) {
     const form = event.currentTarget.form;
     checkFormValidity(form);
+
+    if (type === "error") {
+      setType(null);
+      setMessage(null);
+    }
   }
 
-  /**
-   * Handle form submission.
-   *
-   * @param {React.FormEvent<HTMLFormElement>} event
-   */
   function handleSubmit(event) {
+
     event.preventDefault();
 
     const form = event.currentTarget;
@@ -90,54 +112,95 @@ function App() {
     };
 
     try {
+
       validateUser(user);
+
+      localStorage.setItem("user", JSON.stringify(user));
 
       setMessage("Utilisateur valide");
       setType("success");
+
+      form.reset();
+      setIsFormValid(false);
+      setFieldErrors({});
 
     } catch (error) {
 
       setMessage(error.message);
       setType("error");
+      setIsFormValid(false);
+
+      let newErrors = {};
+
+      if (error.message === "INVALID_EMAIL") {
+        newErrors.email = "Email invalide";
+      }
+
+      if (error.message === "INVALID_POSTAL_CODE") {
+        newErrors.postalCode = "Code postal invalide";
+      }
+
+      if (error.message === "INVALID_IDENTITY") {
+        newErrors.firstname = "Identité invalide";
+      }
+
+      if (error.message === "AGE_UNDER_18") {
+        newErrors.birth = "Vous devez avoir au moins 18 ans";
+      }
+
+      setFieldErrors(newErrors);
     }
   }
 
   return (
-    <div>
+    <div className="container">
       <h1>Formulaire utilisateur</h1>
 
-      <form onSubmit={handleSubmit}>
-        <div>
+      <form onSubmit={handleSubmit} className="form">
+
+        <div className="form-group">
           <label htmlFor="firstname">Prénom</label>
           <input
             id="firstname"
             name="firstname"
             type="text"
             onChange={handleChange}
+            onBlur={handleBlur}
           />
+          {fieldErrors.firstname && (
+            <p className="field-error">{fieldErrors.firstname}</p>
+          )}
         </div>
 
-        <div>
+        <div className="form-group">
           <label htmlFor="lastname">Nom</label>
           <input
             id="lastname"
             name="lastname"
             type="text"
             onChange={handleChange}
+            onBlur={handleBlur}
           />
+          {fieldErrors.lastname && (
+            <p className="field-error">{fieldErrors.lastname}</p>
+          )}
         </div>
 
-        <div>
+        <div className="form-group">
           <label htmlFor="email">Email</label>
           <input
             id="email"
             name="email"
             type="email"
             onChange={handleChange}
+            onBlur={handleBlur}
           />
+          {fieldErrors.email && (
+            <p className="field-error">{fieldErrors.email}</p>
+          )}
         </div>
 
-        <div>
+        <div className="form-group">
           <label htmlFor="birth">Date de naissance</label>
           <input
             id="birth"
@@ -145,9 +208,12 @@ function App() {
             type="date"
             onChange={handleChange}
           />
+          {fieldErrors.birth && (
+            <p className="field-error">{fieldErrors.birth}</p>
+          )}
         </div>
 
-        <div>
+        <div className="form-group">
           <label htmlFor="city">Ville</label>
           <input
             id="city"
@@ -157,26 +223,41 @@ function App() {
           />
         </div>
 
-        <div>
+        <div className="form-group">
           <label htmlFor="postalCode">Code postal</label>
           <input
             id="postalCode"
             name="postalCode"
             type="text"
             onChange={handleChange}
+            onBlur={handleBlur}
           />
+          {fieldErrors.postalCode && (
+            <p className="field-error">{fieldErrors.postalCode}</p>
+          )}
         </div>
 
-        <button type="submit" disabled={!isFormValid}>
+        <button
+          type="submit"
+          disabled={!isFormValid}
+          className={`submit-button ${
+            !isFormValid || type === "error"
+              ? "button-disabled"
+              : "button-enabled"
+          }`}
+        >
           Envoyer
         </button>
+
       </form>
 
       {message && (
         <div
           role="alert"
+          className={`alert ${
+            type === "error" ? "alert-error" : "alert-success"
+          }`}
           style={{
-            marginTop: "20px",
             color: type === "error" ? "red" : "green"
           }}
         >
