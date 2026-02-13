@@ -26,6 +26,16 @@ function App() {
           <input id="birth" type="date" />
         </div>
 
+        <div>
+          <label htmlFor="city">Ville</label>
+          <input id="city" type="text" />
+        </div>
+
+        <div>
+          <label htmlFor="postalCode">Code postal</label>
+          <input id="postalCode" type="text" />
+        </div>
+
         <button type="submit">Envoyer</button>
       </form>
     </div>
