@@ -37,16 +37,10 @@ describe("Integration test - User form", () => {
     expect(screen.getByRole("button")).toBeInTheDocument();
   });
 
-  /**
-   * A valid submission should:
-   * - Display a success message
-   * - Render it inside an element with role="alert"
-   */
   test("should submit valid form and show success message", () => {
 
     render(<App />);
 
-    // Before submit, no alert should be visible
     expect(screen.queryByRole("alert")).toBeNull();
 
     fireEvent.change(screen.getByLabelText(/prénom/i), {
@@ -77,10 +71,6 @@ describe("Integration test - User form", () => {
     expect(alert).toHaveTextContent("Utilisateur valide");
   });
 
-  /**
-   * If user is under 18:
-   * - AGE_UNDER_18 should be displayed visually
-   */
   test("should show error if user is under 18", () => {
 
     render(<App />);
@@ -112,10 +102,6 @@ describe("Integration test - User form", () => {
     expect(alert).toHaveTextContent("AGE_UNDER_18");
   });
 
-  /**
-   * If email format is invalid:
-   * - INVALID_EMAIL should be displayed
-   */
   test("should show error if email format is invalid", () => {
 
     render(<App />);
@@ -147,10 +133,6 @@ describe("Integration test - User form", () => {
     expect(alert).toHaveTextContent("INVALID_EMAIL");
   });
 
-  /**
-   * If postal code format is invalid:
-   * - INVALID_POSTAL_CODE should be displayed
-   */
   test("should show error if postal code format is invalid", () => {
 
     render(<App />);
@@ -180,6 +162,59 @@ describe("Integration test - User form", () => {
     const alert = screen.getByRole("alert");
 
     expect(alert).toHaveTextContent("INVALID_POSTAL_CODE");
+  });
+
+  /**
+   * CHAOTIC USER SCENARIO
+   *
+   * User first submits invalid data,
+   * then corrects the mistake,
+   * and finally succeeds.
+   *
+   * This test validates:
+   * - Error state is displayed
+   * - Error state disappears after correction
+   * - Success state replaces error visually
+   */
+  test("should handle chaotic user: invalid → correction → success", () => {
+
+    render(<App />);
+
+    // First invalid submission (bad email)
+    fireEvent.change(screen.getByLabelText(/prénom/i), {
+      target: { value: "Alice" }
+    });
+
+    fireEvent.change(screen.getByLabelText(/^Nom$/i), {
+      target: { value: "Durand" }
+    });
+
+    fireEvent.change(screen.getByLabelText(/email/i), {
+      target: { value: "alice-test.com" } // invalid
+    });
+
+    fireEvent.change(screen.getByLabelText(/date/i), {
+      target: { value: "1995-01-01" }
+    });
+
+    fireEvent.change(screen.getByLabelText(/code postal/i), {
+      target: { value: "75000" }
+    });
+
+    fireEvent.submit(screen.getByRole("button"));
+
+    let alert = screen.getByRole("alert");
+    expect(alert).toHaveTextContent("INVALID_EMAIL");
+
+    // User corrects the email
+    fireEvent.change(screen.getByLabelText(/email/i), {
+      target: { value: "alice@test.com" }
+    });
+
+    fireEvent.submit(screen.getByRole("button"));
+
+    alert = screen.getByRole("alert");
+    expect(alert).toHaveTextContent("Utilisateur valide");
   });
 
 });
