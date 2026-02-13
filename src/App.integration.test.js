@@ -7,7 +7,7 @@ describe("Integration test - User form", () => {
     render(<App />);
 
     expect(screen.getByLabelText(/prénom/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/nom/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^nom$/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/date/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/ville/i)).toBeInTheDocument();
