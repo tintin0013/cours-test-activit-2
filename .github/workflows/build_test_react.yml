@@ -39,9 +39,10 @@ jobs:
 
       - name: Prepare GitHub Pages artifact
         run: |
-          mkdir -p public-gh-pages
-          cp -r build/* public-gh-pages/
-          cp -r docs/* public-gh-pages/
+          mkdir -p public-gh-pages/react
+          mkdir -p public-gh-pages/docs
+          cp -r build/* public-gh-pages/react/
+          cp -r docs/* public-gh-pages/docs/
 
       - name: Upload artifact for GitHub Pages
         uses: actions/upload-pages-artifact@v3
