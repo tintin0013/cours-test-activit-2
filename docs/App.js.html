@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: App.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: App.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useState } from "react";
+import {
+  validateUser,
+  validateEmail,
+  validatePostalCode,
+  validateIdentity
+} from "./validator";
+import "./App.css";
+
+/**
+ * Main application component.
+ * Displays a user form and validates the data on submit.
+ *
+ * This component manages:
+ * - Form submission
+ * - Field-level validation on blur
+ * - Global validation on submit
+ * - Visual feedback
+ * - Button disabled state
+ * - localStorage persistence
+ *
+ * @component
+ * @returns {JSX.Element}
+ */
+function App() {
+
+  const [message, setMessage] = useState(null);
+  const [type, setType] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [isFormValid, setIsFormValid] = useState(false);
+
+  function checkFormValidity(form) {
+    const formData = new FormData(form);
+
+    if (
+      formData.get("firstname") &amp;&amp;
+      formData.get("lastname") &amp;&amp;
+      formData.get("email") &amp;&amp;
+      formData.get("birth") &amp;&amp;
+      formData.get("postalCode")
+    ) {
+      setIsFormValid(true);
+    } else {
+      setIsFormValid(false);
+    }
+  }
+
+  function handleBlur(event) {
+
+    const name = event.target.name;
+    const value = event.target.value;
+
+    let newErrors = { ...fieldErrors };
+
+    try {
+
+      if (name === "email") {
+        validateEmail(value);
+      }
+
+      if (name === "postalCode") {
+        validatePostalCode(value);
+      }
+
+      if (name === "firstname" || name === "lastname") {
+        validateIdentity(value);
+      }
+
+      newErrors[name] = null;
+
+    } catch (error) {
+
+      if (error.message === "INVALID_EMAIL") {
+        newErrors.email = "Email invalide";
+      }
+
+      if (error.message === "INVALID_POSTAL_CODE") {
+        newErrors.postalCode = "Code postal invalide";
+      }
+
+      if (error.message === "INVALID_IDENTITY") {
+        newErrors[name] = "Identité invalide";
+      }
+    }
+
+    setFieldErrors(newErrors);
+  }
+
+  function handleChange(event) {
+    const form = event.currentTarget.form;
+    checkFormValidity(form);
+
+    if (type === "error") {
+      setType(null);
+      setMessage(null);
+    }
+  }
+
+  function handleSubmit(event) {
+
+    event.preventDefault();
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    const user = {
+      firstname: formData.get("firstname"),
+      lastname: formData.get("lastname"),
+      email: formData.get("email"),
+      birth: new Date(formData.get("birth")),
+      postalCode: formData.get("postalCode")
+    };
+
+    try {
+
+      validateUser(user);
+
+      localStorage.setItem("user", JSON.stringify(user));
+
+      setMessage("Utilisateur valide");
+      setType("success");
+
+      form.reset();
+      setIsFormValid(false);
+      setFieldErrors({});
+
+    } catch (error) {
+
+      setMessage(error.message);
+      setType("error");
+      setIsFormValid(false);
+
+      let newErrors = {};
+
+      if (error.message === "INVALID_EMAIL") {
+        newErrors.email = "Email invalide";
+      }
+
+      if (error.message === "INVALID_POSTAL_CODE") {
+        newErrors.postalCode = "Code postal invalide";
+      }
+
+      if (error.message === "INVALID_IDENTITY") {
+        newErrors.firstname = "Identité invalide";
+      }
+
+      if (error.message === "AGE_UNDER_18") {
+        newErrors.birth = "Vous devez avoir au moins 18 ans";
+      }
+
+      setFieldErrors(newErrors);
+    }
+  }
+
+  return (
+    &lt;div className="container">
+      &lt;h1>Formulaire utilisateur&lt;/h1>
+
+      &lt;form onSubmit={handleSubmit} className="form">
+
+        &lt;div className="form-group">
+          &lt;label htmlFor="firstname">Prénom&lt;/label>
+          &lt;input
+            id="firstname"
+            name="firstname"
+            type="text"
+            onChange={handleChange}
+            onBlur={handleBlur}
+          />
+          {fieldErrors.firstname &amp;&amp; (
+            &lt;p className="field-error">{fieldErrors.firstname}&lt;/p>
+          )}
+        &lt;/div>
+
+        &lt;div className="form-group">
+          &lt;label htmlFor="lastname">Nom&lt;/label>
+          &lt;input
+            id="lastname"
+            name="lastname"
+            type="text"
+            onChange={handleChange}
+            onBlur={handleBlur}
+          />
+          {fieldErrors.lastname &amp;&amp; (
+            &lt;p className="field-error">{fieldErrors.lastname}&lt;/p>
+          )}
+        &lt;/div>
+
+        &lt;div className="form-group">
+          &lt;label htmlFor="email">Email&lt;/label>
+          &lt;input
+            id="email"
+            name="email"
+            type="email"
+            onChange={handleChange}
+            onBlur={handleBlur}
+          />
+          {fieldErrors.email &amp;&amp; (
+            &lt;p className="field-error">{fieldErrors.email}&lt;/p>
+          )}
+        &lt;/div>
+
+        &lt;div className="form-group">
+          &lt;label htmlFor="birth">Date de naissance&lt;/label>
+          &lt;input
+            id="birth"
+            name="birth"
+            type="date"
+            onChange={handleChange}
+          />
+          {fieldErrors.birth &amp;&amp; (
+            &lt;p className="field-error">{fieldErrors.birth}&lt;/p>
+          )}
+        &lt;/div>
+
+        &lt;div className="form-group">
+          &lt;label htmlFor="city">Ville&lt;/label>
+          &lt;input
+            id="city"
+            name="city"
+            type="text"
+            onChange={handleChange}
+          />
+        &lt;/div>
+
+        &lt;div className="form-group">
+          &lt;label htmlFor="postalCode">Code postal&lt;/label>
+          &lt;input
+            id="postalCode"
+            name="postalCode"
+            type="text"
+            onChange={handleChange}
+            onBlur={handleBlur}
+          />
+          {fieldErrors.postalCode &amp;&amp; (
+            &lt;p className="field-error">{fieldErrors.postalCode}&lt;/p>
+          )}
+        &lt;/div>
+
+        &lt;button
+          type="submit"
+          disabled={!isFormValid}
+          className={`submit-button ${
+            !isFormValid || type === "error"
+              ? "button-disabled"
+              : "button-enabled"
+          }`}
+        >
+          Envoyer
+        &lt;/button>
+
+      &lt;/form>
+
+      {message &amp;&amp; (
+        &lt;div
+          role="alert"
+          className={`alert ${
+            type === "error" ? "alert-error" : "alert-success"
+          }`}
+          style={{
+            color: type === "error" ? "red" : "green"
+          }}
+        >
+          {message}
+        &lt;/div>
+      )}
+    &lt;/div>
+  );
+}
+
+export default App;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-module.html">module</a></li><li><a href="module-validator.html">validator</a></li></ul><h3>Global</h3><ul><li><a href="global.html#App">App</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Wed Feb 18 2026 15:23:08 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

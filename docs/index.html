@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Home</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Home</h1>
+
+    
+
+
+
+    
+
+
+    <h3> </h3>
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+    <section>
+        <article><h1>Activité 2 -- Tests d'intégration &amp; Validation avancée</h1>
+<h2>Objectif pédagogique</h2>
+<p>Cette activité avait pour objectif de :</p>
+<ul>
+<li>Mettre en place des <strong>tests d'intégration avec React Testing
+Library</strong></li>
+<li>Renforcer la <strong>robustesse des validations métier</strong></li>
+<li>Atteindre <strong>100% de couverture de code</strong></li>
+<li>Respecter une approche <strong>TDD (Test Driven Development)</strong></li>
+<li>Produire une <strong>documentation claire et structurée</strong></li>
+</ul>
+<hr>
+<h2>Architecture du projet</h2>
+<p>Le projet est structuré de la manière suivante :</p>
+<p>src/ ├── App.js ├── App.integration.test.js ├── module.js ├──
+module.test.js ├── validator.js ├── validator.test.js</p>
+<h3>Séparation des responsabilités</h3>
+<ul>
+<li>module.js → logique métier pure (calcul d'âge)</li>
+<li>validator.js → règles métier (âge, email, code postal, identité)</li>
+<li>App.js → couche React (interface + intégration)</li>
+<li>*.test.js → tests unitaires et tests d'intégration</li>
+</ul>
+<hr>
+<h2>Stratégie de test</h2>
+<h3>1️⃣ Tests unitaires</h3>
+<p>Fichiers concernés : - module.test.js - validator.test.js</p>
+<p>Objectifs : - Tester chaque fonction indépendamment - Vérifier les cas
+limites - Vérifier les erreurs attendues - Sécuriser les entrées
+invalides</p>
+<p>Exemples de scénarios couverts :</p>
+<ul>
+<li>Age &lt; 18 → AGE_UNDER_18</li>
+<li>Email invalide → INVALID_EMAIL</li>
+<li>Code postal incorrect → INVALID_POSTAL_CODE</li>
+<li>Tentatives d'injection HTML → rejetées</li>
+<li>Gestion année bissextile</li>
+</ul>
+<hr>
+<h3>2️⃣ Tests d'intégration</h3>
+<p>Fichier concerné : - App.integration.test.js</p>
+<p>Objectifs : - Simuler un utilisateur réel - Remplir le formulaire -
+Soumettre le formulaire - Vérifier le rendu visuel (role=&quot;alert&quot;)</p>
+<p>Scénarios couverts :</p>
+<ul>
+<li>Soumission valide → message vert &quot;Utilisateur valide&quot;</li>
+<li>Utilisateur mineur → message rouge &quot;AGE_UNDER_18&quot;</li>
+<li>Email invalide → message rouge &quot;INVALID_EMAIL&quot;</li>
+<li>Code postal invalide → message rouge &quot;INVALID_POSTAL_CODE&quot;</li>
+</ul>
+<p>Les tests vérifient les états visuels dans le DOM, conformément au
+barème.</p>
+<hr>
+<h2>Robustesse de l'implémentation</h2>
+<p>L'application :</p>
+<ul>
+<li>Empêche la soumission invalide</li>
+<li>Gère les valeurs null / undefined</li>
+<li>Vérifie les types</li>
+<li>Sépare logique métier et couche UI</li>
+<li>Utilise FormData pour une récupération robuste des champs</li>
+</ul>
+<hr>
+<h2>Couverture de code</h2>
+<p>Objectif : 100% de couverture (hors index.js et reportWebVitals.js)</p>
+<p>Couverture atteinte :</p>
+<ul>
+<li>Statements : 100%</li>
+<li>Branches : 100%</li>
+<li>Functions : 100%</li>
+<li>Lines : 100%</li>
+</ul>
+<hr>
+<h2>Démarche TDD</h2>
+<p>Historique Git structuré :</p>
+<ol>
+<li>Écriture des tests</li>
+<li>Implémentation minimale</li>
+<li>Correction des erreurs</li>
+<li>Refactorisation légère</li>
+<li>Ajout des tests d'intégration</li>
+<li>Amélioration du rendu visuel</li>
+</ol>
+<p>Chaque étape est tracée via des commits explicites.</p>
+<hr>
+<h2>Documentation</h2>
+<p>Le projet contient une documentation JSDoc complète :</p>
+<ul>
+<li>Description des modules</li>
+<li>Paramètres typés</li>
+<li>Erreurs documentées</li>
+<li>Explication des règles métier</li>
+</ul>
+<hr>
+<h2>Conclusion</h2>
+<p>L'activité 2 respecte :</p>
+<ul>
+<li>✔ Qualité des tests d'intégration</li>
+<li>✔ Robustesse de l'implémentation</li>
+<li>✔ 100% de couverture</li>
+<li>✔ Documentation claire</li>
+<li>✔ Séparation logique métier / UI</li>
+<li>✔ Approche TDD traçable</li>
+</ul>
+<p>Projet réalisé en mode pédagogique (code clair, lisible et
+volontairement explicite).</p></article>
+    </section>
+
+
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>App.integration.test.js</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description">App.integration.test.js
+
+Integration tests for the User form.
+
+These tests simulate real user interaction and verify:
+- Rendering of the form
+- Validation logic integration
+- Visual feedback in the DOM (role="alert")
+- Visual state (color red for error, green for success)
+- Button disabled state (grey button when invalid)
+- localStorage persistence (jsdom simulation)
+
+We test the full chain:
+App.js → validator.js → module.js
+
+The goal is to validate real user behaviour,
+not internal implementation details.</div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="App.integration.test.js.html">App.integration.test.js</a>, <a href="App.integration.test.js.html#line4">line 4</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>validator.test.js</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description">validator.test.js
+
+Unit tests for validator.js.
+
+These tests verify:
+- Age validation rules
+- Postal code format
+- Email format
+- Identity validation
+- Full user validation logic
+
+The goal is to test business rules independently
+from the React integration layer.</div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="validator.test.js.html">validator.test.js</a>, <a href="validator.test.js.html#line9">line 9</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-module.html">module</a></li><li><a href="module-validator.html">validator</a></li></ul><h3>Global</h3><ul><li><a href="global.html#App">App</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Wed Feb 18 2026 15:23:08 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
