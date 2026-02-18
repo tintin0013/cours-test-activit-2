@@ -37,23 +37,23 @@ jobs:
       - name: Generate JSDoc
         run: npm run jsdoc
 
-      - name: Setup Pages
+      - name: Setup GitHub Pages
         id: pages
         uses: actions/configure-pages@v3
 
       # Upload React build artifact
       - name: Upload React build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: react-build
           path: build
+          name: react-build
 
       # Upload JSDoc artifact
       - name: Upload JSDoc artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: jsdoc
           path: docs
+          name: jsdoc
 
   deploy:
     needs: build_test
@@ -65,20 +65,6 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      # Download React build artifact
-      - name: Download React build artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: react-build
-          path: build
-
-      # Download JSDoc artifact
-      - name: Download JSDoc artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: jsdoc
-          path: docs
-
-      - name: Deploy to GitHub Pages
+      - name: Deploy to Github Pages
         id: deployment
         uses: actions/deploy-pages@v4
