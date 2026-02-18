@@ -37,11 +37,14 @@ jobs:
       - name: Generate JSDoc
         run: npm run jsdoc
 
+      # Préparer les artefacts pour GitHub Pages
       - name: Prepare GitHub Pages artifact
         run: |
-          mkdir -p public-gh-pages/react
+          mkdir -p public-gh-pages
+          # React build à la racine
+          cp -r build/* public-gh-pages/
+          # JSDoc dans /docs/
           mkdir -p public-gh-pages/docs
-          cp -r build/* public-gh-pages/react/
           cp -r docs/* public-gh-pages/docs/
 
       - name: Upload artifact for GitHub Pages
