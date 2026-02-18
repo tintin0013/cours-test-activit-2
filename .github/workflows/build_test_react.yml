@@ -37,23 +37,16 @@ jobs:
       - name: Generate JSDoc
         run: npm run jsdoc
 
-      - name: Setup Pages
-        id: pages
-        uses: actions/configure-pages@v3
+      - name: Prepare GitHub Pages artifact
+        run: |
+          mkdir -p public-gh-pages
+          cp -r build/* public-gh-pages/
+          cp -r docs/* public-gh-pages/
 
-      # Upload React build artifact
-      - name: Upload React build artifact
+      - name: Upload artifact for GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
-          path: build
-          name: react-build
-
-      # Upload JSDoc artifact
-      - name: Upload JSDoc artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: docs
-          name: jsdoc
+          path: public-gh-pages
 
   deploy:
     needs: build_test
