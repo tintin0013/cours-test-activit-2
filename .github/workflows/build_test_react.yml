@@ -1,4 +1,4 @@
-name: Build and Test React Application
+name: Build, Test and Deploy React Application
 
 # Controls when the action will run. 
 on:
