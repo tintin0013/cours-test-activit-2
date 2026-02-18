@@ -9,7 +9,7 @@
   },
   "plugins": [],
   "opts": {
-    "destination": "./public/docs",
+    "destination": "./docs",
     "recurse": true,
     "readme": "./README.md"
   }
