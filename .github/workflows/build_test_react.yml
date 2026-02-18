@@ -14,46 +14,48 @@ jobs:
         node-version: [18.x]
 
     steps:
+      # Checkout code
       - uses: actions/checkout@v2
 
+      # Setup Node.js
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
 
+      # Install dependencies
       - name: npm install
         run: npm install
 
+      # Build React app and run tests
       - name: npm run build and test
         run: |
           npm run build --if-present
           npm test
 
+      # Upload coverage reports to Codecov
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
+      # Generate JSDoc
       - name: Generate JSDoc
         run: npm run jsdoc
 
-      - name: Setup GitHub Pages
+      # Setup GitHub Pages
+      - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v3
 
-      # Upload React build artifact
-      - name: Upload React build artifact
+      # Upload one artifact containing both React build + JSDoc
+      - name: Upload combined artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: build
-          name: react-build
-
-      # Upload JSDoc artifact
-      - name: Upload JSDoc artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: docs
-          name: jsdoc
+          path: |
+            build
+            docs
+          name: github-pages
 
   deploy:
     needs: build_test
@@ -65,6 +67,8 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy to Github Pages
+      - name: Deploy artifact to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          artifact-name: github-pages
