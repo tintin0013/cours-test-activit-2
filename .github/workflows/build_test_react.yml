@@ -46,14 +46,14 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: build
-          name: react-build
+          name: react-build-artifact
 
       # Upload JSDoc artifact
       - name: Upload JSDoc artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: docs
-          name: jsdoc
+          name: jsdoc-artifact
 
   deploy:
     needs: build_test
@@ -65,6 +65,16 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy to Github Pages
+      - name: Deploy React build artifact
+        uses: actions/download-pages-artifact@v1
+        with:
+          name: react-build-artifact
+
+      - name: Deploy JSDoc artifact
+        uses: actions/download-pages-artifact@v1
+        with:
+          name: jsdoc-artifact
+
+      - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
