@@ -1,8 +1,7 @@
-name: Build, Test and Deploy React Application
+name: Build and Test React Application
 
 # Controls when the action will run. 
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
   push:
     branches: [ main ]
   pull_request:
@@ -30,35 +29,40 @@ jobs:
           npm run build --if-present
           npm test
 
-      # ⬇️ AJOUT CODECOV
+      # ⬇️ Upload coverage reports to Codecov
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-      # ⬇️ GENERATION JSDOC
+      # ⬇️ Generate JSDoc
       - name: Generate JSDoc
         run: npm run jsdoc
 
+      # ⬇️ Setup GitHub Pages
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v3
 
-      # ⬇️ Upload both React build and JSDoc
-      - name: Upload artifact
+      # ⬇️ Upload React build artifact
+      - name: Upload React build artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: |
-            build
-            docs
+          path: build
+
+      # ⬇️ Upload JSDoc artifact
+      - name: Upload JSDoc artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
 
   deploy:
     needs: build_test
-    permissions: 
+    permissions:
       pages: write
       id-token: write
     runs-on: ubuntu-latest
-    environment: 
+    environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
