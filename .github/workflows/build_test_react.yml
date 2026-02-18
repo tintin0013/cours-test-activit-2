@@ -1,6 +1,6 @@
 name: Build and Test React Application
 
-# Controls when the action will run. 
+# Controls when the action will run.
 on:
   push:
     branches: [ main ]
@@ -66,6 +66,6 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy to Github Pages
+      - name: Deploy React + JSDoc to Github Pages
         id: deployment
         uses: actions/deploy-pages@v4
