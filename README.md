@@ -12,6 +12,16 @@ Cette activité avait pour objectif de :
 -   Produire une **documentation claire et structurée**
 
 ------------------------------------------------------------------------
+## Livrables du jour
+
+| Type | Lien |
+|------|------|
+| Dépôt GitHub | [cours-test-activit-2](https://github.com/tintin0013/cours-test-activit-2) |
+| Application React déployée | [https://tintin0013.github.io/cours-test-activit-2/](https://tintin0013.github.io/cours-test-activit-2/) |
+| Documentation JSDoc | [https://tintin0013.github.io/cours-test-activit-2/docs/](https://tintin0013.github.io/cours-test-activit-2/docs/) |
+| Tableau de bord Codecov | [https://codecov.io/gh/tintin0013/cours-test-activit-2](https://codecov.io/gh/tintin0013/cours-test-activit-2) |
+
+-------------------------------------------------------------------------
 
 ##  Architecture du projet
 
