@@ -1,4 +1,4 @@
-name: Build and Test React Application
+name: Build, Test and Deploy React + JSDoc
 
 on:
   push:
@@ -21,9 +21,11 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: npm ci and test
+      - name: npm install
+        run: npm install
+
+      - name: npm run build and test
         run: |
-          npm ci
           npm run build --if-present
           npm test
 
@@ -39,26 +41,40 @@ jobs:
         id: pages
         uses: actions/configure-pages@v3
 
+      # Upload React build artifact
       - name: Upload React build artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: build
+          name: react-build
 
+      # Upload JSDoc artifact
       - name: Upload JSDoc artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: docs
+          name: jsdoc
 
   deploy:
     needs: build_test
+    runs-on: ubuntu-latest
     permissions:
       pages: write
       id-token: write
-    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy to Github Pages
+      - name: Deploy React build artifact
+        uses: actions/download-pages-artifact@v1
+        with:
+          name: react-build
+
+      - name: Deploy JSDoc artifact
+        uses: actions/download-pages-artifact@v1
+        with:
+          name: jsdoc
+
+      - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
