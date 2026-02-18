@@ -39,14 +39,9 @@ jobs:
 
       - name: Prepare GitHub Pages artifact
         run: |
-          mkdir -p public-gh-pages/app
-          mkdir -p public-gh-pages/docs
-          cp -r build/* public-gh-pages/app/
-          cp -r docs/* public-gh-pages/docs/
-
-      - name: Setup Pages
-        id: pages
-        uses: actions/configure-pages@v3
+          mkdir -p public-gh-pages
+          cp -r build/* public-gh-pages/
+          cp -r docs/* public-gh-pages/
 
       - name: Upload artifact for GitHub Pages
         uses: actions/upload-pages-artifact@v3
