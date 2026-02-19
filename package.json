@@ -10,6 +10,7 @@
     "@testing-library/user-event": "^13.5.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
+    "react-router-dom": "^6.30.3",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
@@ -18,7 +19,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test --coverage --collectCoverageFrom=!src/reportWebVitals.js --collectCoverageFrom=!src/index.js --watchAll=false",
     "eject": "react-scripts eject",
-    "jsdoc": "jsdoc -R ./README.md -c ./jsdoc.config.json -r -d ./docs"
+    "jsdoc": "jsdoc -R ./README.md -c ./jsdoc.config.json -r -d ./docs",
+    "cypress": "cypress open"
   },
   "eslintConfig": {
     "extends": [
@@ -39,6 +41,7 @@
     ]
   },
   "devDependencies": {
+    "cypress": "^14.5.4",
     "jsdoc": "^4.0.5",
     "react-test-renderer": "^19.2.4"
   }
