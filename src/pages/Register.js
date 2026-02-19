@@ -1,11 +1,11 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   validateUser,
   validateEmail,
   validatePostalCode,
   validateIdentity
 } from "../validator";
-import { useNavigate } from "react-router-dom";
 
 function Register({ addUser }) {
   const [message, setMessage] = useState(null);
@@ -16,17 +16,14 @@ function Register({ addUser }) {
 
   function checkFormValidity(form) {
     const formData = new FormData(form);
-    if (
-      formData.get("firstname") &&
-      formData.get("lastname") &&
-      formData.get("email") &&
-      formData.get("birth") &&
-      formData.get("postalCode")
-    ) {
-      setIsFormValid(true);
-    } else {
-      setIsFormValid(false);
-    }
+    const firstname = formData.get("firstname")?.trim();
+    const lastname = formData.get("lastname")?.trim();
+    const email = formData.get("email")?.trim();
+    const birth = formData.get("birth")?.trim();
+    const postalCode = formData.get("postalCode")?.trim();
+    const city = formData.get("city")?.trim();
+
+    setIsFormValid(firstname && lastname && email && birth && postalCode && city);
   }
 
   function handleBlur(event) {
@@ -49,8 +46,7 @@ function Register({ addUser }) {
   }
 
   function handleChange(event) {
-    const form = event.currentTarget.form;
-    checkFormValidity(form);
+    checkFormValidity(event.currentTarget.form);
     if (type === "error") {
       setType(null);
       setMessage(null);
@@ -85,7 +81,6 @@ function Register({ addUser }) {
       navigate("/"); // Retour à l'accueil
 
     } catch (error) {
-      setMessage(error.message);
       setType("error");
       setIsFormValid(false);
 
@@ -96,6 +91,13 @@ function Register({ addUser }) {
       if (error.message === "AGE_UNDER_18") newErrors.birth = "Vous devez avoir au moins 18 ans";
 
       setFieldErrors(newErrors);
+      setMessage(
+        error.message === "INVALID_EMAIL" ? "Email invalide" :
+        error.message === "INVALID_POSTAL_CODE" ? "Code postal invalide" :
+        error.message === "INVALID_IDENTITY" ? "Identité invalide" :
+        error.message === "AGE_UNDER_18" ? "Vous devez avoir au moins 18 ans" :
+        error.message
+      );
     }
   }
 
@@ -144,11 +146,7 @@ function Register({ addUser }) {
         </button>
       </form>
 
-      {message && (
-        <div role="alert" className={`alert ${type === "error" ? "alert-error" : "alert-success"}`} style={{ color: type === "error" ? "red" : "green" }}>
-          {message}
-        </div>
-      )}
+      {message && <div role="alert" className={`alert ${type === "error" ? "alert-error" : "alert-success"}`} style={{ color: type === "error" ? "red" : "green" }}>{message}</div>}
     </div>
   );
 }
